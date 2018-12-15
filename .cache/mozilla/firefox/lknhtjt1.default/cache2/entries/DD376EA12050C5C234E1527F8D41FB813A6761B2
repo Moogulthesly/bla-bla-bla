@@ -1,0 +1,323 @@
+<!DOCTYPE doctype PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+
+<head>
+
+
+<link href="../monthfea.css" type="text/css" rel="stylesheet" />
+
+   
+  <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" >
+
+   
+  <meta name="keywords" content="linux,screenshot,screenshots,import,xwd,gimp">
+
+   
+  <meta name="author" content="slitt" >
+
+   
+  <meta name="Description" content="Here's how to  install an ATAPI CDRW (CD rewriter) drive on your Linux box">
+
+   
+  <meta name="generator" content="Bluefish 2.2.3" >
+
+   
+  <meta name="Keywords" content="cd,cdr,cdrw,atapi,ide,cdrecord,scanbus,scsi,scsi emulation,linux,red hat,mandrake,debian,">
+  <title>Adding a Directory to the Path</title>
+
+
+<link href="../monthfea.css" type="text/css" rel="stylesheet" />
+<script language='javascript' src='../monthfea.js'></script>
+
+
+
+<style type="text/css">
+ul.contents li{margin-bottom: 1.4ex;}
+h2.presents{line-height: 3ex;}
+</style>
+
+
+
+
+
+<style type="text/css">body{font-size: 125%;}</style>
+<meta name="viewport"q content="width=device-width, initial-scale=0.65"/>
+
+
+
+</head>
+
+
+<body alink="#ff0000" background="prepostpath_files/tcbk" bgcolor="#ffffff" link="#0000ee" text="#000000" vlink="#551a8b" onload="loaddiv()" >
+
+
+
+<center>
+<h2 class="presents">
+<a href="../troubleshooters.htm">Troubleshooters.Com</a> and <a href="../linux/index.htm">T.C
+Linux Library</a> Present</h2>
+</center>
+
+
+<center>
+<h1>
+<font color="#c80000">Adding a Directory to the Path</font></h1>
+</center>
+
+
+<center><a href="../cpyright.htm">Copyright (C) 2002</a> by Steve
+Litt</center>
+
+
+<center>
+<h5>
+[ <a href="index.htm">Linux Library</a>&nbsp; | &nbsp;<a href="../troubleshooters.htm">Troubleshooters.Com</a>&nbsp;
+| &nbsp;<a href="../email_steve_litt.htm">Email Steve Litt</a>&nbsp; | &nbsp;<a href="../cpyright.htm">Copyright
+Notice</a> ]</h5>
+</center>
+
+
+
+
+<div class="monthfea" id="monthfea">
+<p class="monthfea">See the <a href="http://www.troubleshooters.com/bookstore/">Troubleshooters.Com Bookstore</a>.</p>
+</div>
+
+
+
+
+<h1>
+Contents:</h1>
+
+<ul class="contents">
+
+  <li><b><a href="#_Disclaimer">Disclaimer</a></b></li>
+
+  <li><b><a href="#_pre_and_post_pathing">Pre and Post Pathing</a></b></li>
+
+  <li><b><a href="#_singleuser">Adding to a Single User's Path</a></b></li>
+
+  <li><b><a href="#_allusers">Adding to All Users' Paths (except root)</a></b></li>
+
+  <li><b><a href="#_root">Adding to the Path of User <tt>root</tt></a></b></li>
+
+  <li><b><a href="#_Summary">Summary</a></b></li>
+
+</ul>
+
+
+<h1>
+<a name="_ExecSumm"></a>Executive Summary</h1>
+
+<b>Adding a directory to the path of a user or all users would seem trivial,
+but in fact it isn't. The best place to add a directory to the path of a
+single user is to modify that user's <tt>.bash_profile</tt> file. To add it to all users except user <tt>root</tt>, add it to <tt>/etc/profile</tt>. To also add it to the path of user <tt>root</tt>, add it to <tt>root</tt>'s <tt>.bash_profile</tt> file.</b>
+<ul>
+
+</ul>
+
+
+<h1>
+<a name="_Disclaimer"></a>Disclaimer</h1>
+
+Obviously, you use this document at your own risk. I am not responsible
+for any damage or injury caused by your use of this document, or caused
+by errors and/or omissions in this document. If that's not acceptable to
+you, you may not use this document. By using this document you are accepting
+this disclaimer.<br>
+
+<h1>
+<a name="_pre_and_post_pathing"></a>Pre and Post Pathing</h1>
+
+<p>Linux determines the executable search path with the <tt>$PATH</tt> environment variable. To add directory <tt>/data/myscripts</tt> to the beginning of the <tt>$PATH</tt> environment variable, use the following:<br>
+
+</p>
+
+<pre>PATH=/data/myscripts:$PATH<br></pre>
+
+To add that directory to the end of the path, use the following command:<br>
+
+<pre>PATH=$PATH:/data/myscripts<br></pre>
+
+But the preceding are not sufficient because when you set an environment
+variable inside a script, that change is effective only within the script.
+There are only two ways around this limitation:<br>
+
+<ol>
+
+  <li>If, within the script, you export the environment variable it is effective within any programs called <b><i>by</i></b> the script. Note that it is not effective within the program that <b><i>called</i></b> the script.</li>
+
+  <li>If the program that calls the script does so by inclusion instead of
+calling, any environment changes in the script are effective within the calling
+program. Such inclusion can be done with the dot command or the source command.
+Examples:<br>
+
+    <tt>. $HOME/myscript.sh<br>
+
+source $HOME/myscript.sh</tt></li>
+
+</ol>
+
+Inclusion basically incorporates the "called" script in the "calling" script. It's like a <tt>#include</tt>
+in C. So it's effective inside the "calling" script or program. But of course,
+it's not effective in any programs or scripts called by the calling program.
+To make it effective all the way down the call chain, you must follow the
+setting of the environment variable with an export command.<br>
+
+<br>
+
+As an example, the <tt>bash</tt> shell program incorporates the contents of file <tt>.bash_profile</tt> by inclusion. So putting the following 2 lines in <tt>.bash_profile</tt>:<br>
+
+<pre>PATH=$PATH:/data/myscripts<br>export PATH<br></pre>
+
+effectively puts those 2 lines of code in the <tt>bash</tt> program. So within <tt>bash</tt> the <tt>$PATH</tt> variable includes <tt>$HOME/myscript.sh</tt>, and because of the <tt>export</tt> statement, any programs called by <tt>bash</tt> have the altered <tt>$PATH</tt> variable. And because any programs you run from a <tt>bash</tt> prompt are called by <tt>bash</tt>, the new path is in force for anything you run from the <tt>bash</tt> prompt.<br>
+
+<br>
+
+The bottom line is that to add a new directory to the path, you must append or prepend the directory to the <tt>$PATH</tt> environment variable within a script included in the shell, and you must export the <tt>$PATH</tt> environnment variable. The only remaining question is: In which script do you place those two lines of code?
+
+<h1>
+<a name="_singleuser"></a>Adding to a Single User's Path</h1>
+
+<p>To add a directory to the path of a single user, place the lines in that user's <tt>.bash_profile</tt> file. Typically, <tt>.bash_profile</tt> already contains changes to the <tt>$PATH</tt> variable and also contains an <tt>export</tt> statement, so you can simply add the desired directory to the end or beginning of the existing statement that changes the <tt>$PATH</tt> variable. However, if <tt>.bash_profile</tt> doesn't contain the path changing code, simply add the following two lines to the end of the <tt>.bash_profile</tt> file:<br>
+
+</p>
+
+<pre>PATH=$PATH:/data/myscripts<br>export PATH<br></pre>
+
+<h1>
+<a name="_allusers"></a>Adding to All Users' Paths (except root)</h1>
+<p>
+</p>
+You globally set a path in <tt>/etc/profile</tt>. That setting is global for all users except user <tt>root</tt>. Typical <tt>/etc/profile</tt> files extensively modify the <tt>$PATH</tt> variable, and then <tt>export</tt>
+that variable. What that means is you can modify the path by appending or
+prepending the desired directory(s) in existing statements modifying the
+path. Or, you can add your own path modification statements anywhere before
+the existing <tt>export</tt> statement. In the very unlikely event that there are no path modification or export statements in <tt>/etc/profile</tt>, you can insert the following 2 lines of code at the bottom of <tt>/etc/profile</tt>:<br>
+
+<br>
+
+
+
+<pre>PATH=$PATH:/data/myscripts<br>export PATH<br></pre>
+
+
+<h1><a name="_root"></a>Adding to the Path of User <tt>root</tt></h1>
+
+User <tt>root</tt> is a special case, at least on Mandrake systems. Unlike other users, <tt>root</tt> is not affected by the path settings in <tt>/etc/profile</tt>. The reason is simple enough. User <tt>root</tt>'s path is set from scratch by its <tt>.bash_profile</tt> script. In order to add to the path of user <tt>root</tt>, modify its <tt>.bash_profile</tt>.<br>
+
+<p>
+</p>
+
+<h1>
+<a name="_Summary"></a>Summary</h1>
+A fundimental administration task is adding directories to the execution paths of one or more users. The basic code to do so is:<br>
+
+<pre>PATH=$PATH:/data/myscripts<br>export PATH<br></pre>
+
+
+
+<h1>
+</h1>
+
+
+
+Place that code, or whatever part of that code isn't already incorporated, in one of the following places:<br>
+
+<br>
+
+<table border="1" cellpadding="2" cellspacing="2">
+
+  <tbody>
+
+    <tr>
+
+      <td bgcolor="#cccccc" valign="top">User Class<br>
+
+      </td>
+
+      <td bgcolor="#cccccc" valign="top">Script to modify<br>
+
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td valign="top">One user<br>
+
+      </td>
+
+      <td valign="top">$HOME/.bash_profile<br>
+
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td valign="top">All users except root<br>
+
+      </td>
+
+      <td valign="top">/etc/profile<br>
+
+      </td>
+
+    </tr>
+
+    <tr>
+
+      <td valign="top">root<br>
+
+      </td>
+
+      <td valign="top">/root/.bash_profile<br>
+
+      </td>
+
+    </tr>
+
+  
+  </tbody>
+</table>
+
+
+<p>
+</p>
+<hr>
+<p>See also: [ <a href="../linux/index.htm">Linux Library</a> | <a href="../troubleshooters.htm">Troubleshooters.Com</a>
+| <a href="../email_steve_litt.htm">Email Steve Litt</a> | <a href="../cpyright.htm">Copyright
+Notice</a> ]
+</p>
+<p><a href="../cpyright.htm#top"><img src="../images/biglcpyr.gif" nosave="" alt="Copyright image" border="0" height="30" width="30"></a><a href="../cpyright.htm#top">Copyright
+(C) 2002 by Steve Litt.</a> -- <a href="../cpyright.htm#top">Legal</a>
+<br>
+&nbsp;
+<br>
+&nbsp;
+</p>
+<br>
+
+
+</body>
+
+</html>
+ˆ‘ö²g(      \ÿ)\ÿ*?ÓŽd\9©   5    :http://www.troubleshooters.com/linux/prepostpath.htm necko:classified 1 strongly-framed 1 request-method GET response-head HTTP/1.1 200 OK
+Date: Sat, 15 Dec 2018 13:18:34 GMT
+Server: Apache
+Last-Modified: Wed, 12 Aug 2015 17:01:51 GMT
+ETag: "3e2dde-2544-55cb7bff"
+Accept-Ranges: bytes
+Content-Length: 9540
+Content-Type: text/html
+ original-response-headers Date: Sat, 15 Dec 2018 13:18:34 GMT
+Server: Apache
+Last-Modified: Wed, 12 Aug 2015 17:01:51 GMT
+ETag: "3e2dde-2544-55cb7bff"
+Accept-Ranges: bytes
+Content-Length: 9540
+Keep-Alive: timeout=5, max=100
+Connection: Keep-Alive
+Content-Type: text/html
+ uncompressed-len 0 net-response-time-onstart 353 net-response-time-onstop 374 predictor::resource-count 4 predictor::http://www.troubleshooters.com/monthfea.css 1,1,1544879913,4097 predictor::http://www.troubleshooters.com/monthfea.js 1,1,1544879913,4097 predictor::http://www.troubleshooters.com/images/biglcpyr.gif 1,1,1544879913,4097 predictor::http://www.troubleshooters.com/linux/prepostpath_files/tcbk 1,1,1544879913,4096   %D

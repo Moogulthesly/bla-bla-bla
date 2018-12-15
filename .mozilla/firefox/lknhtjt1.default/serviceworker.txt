@@ -1,0 +1,11 @@
+8
+
+https://forum.theodinproject.com/
+https://forum.theodinproject.com/service-worker-d3b8b71a01031300e2681e9938384e7f02ce03444a3735ed51ddf8e75571c8b5.js
+true
+{cf408246-8990-4144-8205-7e90bb6d6eeb}
+0
+1544879106304337
+1544879106659748
+1544879105166506
+#
